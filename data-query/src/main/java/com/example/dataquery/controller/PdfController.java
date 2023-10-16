@@ -12,7 +12,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @RestController
 public class PdfController {
@@ -29,7 +31,7 @@ public class PdfController {
     }
 
     @GetMapping("/pdf/{id}")
-    public ResponseEntity<byte[]> getFile(@PathVariable String id) {
+    public ResponseEntity<byte[]> getPdf(@PathVariable String id) {
         Optional<PdfDocument> fileEntityOptional = pdfService.getPdf(id);
 
         if (!fileEntityOptional.isPresent()) {
@@ -42,6 +44,22 @@ public class PdfController {
                 .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileEntity.getTitle() + "\"")
                 .contentType(MediaType.valueOf(fileEntity.getContentType()))
                 .body(fileEntity.getData());
+    }
+
+    @GetMapping("/pdf/info/id")
+    public List<String> getAllPdfsIds() {
+        List<PdfDocument> allFiles = pdfService.getAllPdfs();
+        return allFiles.stream().map(PdfDocument::getId).collect(Collectors.toList());
+    }
+
+    @GetMapping("/pdf/info")
+    public List<PdfDocument> getAllPdfsInfo() {
+        return pdfService.getAllPdfs();
+    }
+
+    @GetMapping("/pdf/info/{id}")
+    public Optional<PdfDocument> getPdfInfo(@PathVariable String id) {
+        return pdfService.getPdf(id);
     }
 
     @GetMapping("/test")
