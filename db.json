@@ -1,11 +1,26 @@
 {
-  "pdfIds": [
-
-    {"id":"17a06d48-82c9-4b95-bdd0-6787eff2a240"},
-    {"id":"904ae542-0bc7-454b-87b1-5814d37b2954"}
-  
-  ],
-  "profile": {
-    "name": "typicode"
-  }
+  "posts": [
+    {
+      "id":"1",
+      "author":"1",
+      "pdfDocument":"17a06d48-82c9-4b95-bdd0-6787eff2a240",
+      "postText":"post example 1 for a given pdf document",
+      "comments": [
+        {"id":"1", "author":"12", "comment":"comment example 1 for a given post 1"},
+        {"id":"2", "author":"12", "comment":"comment example 2 for a given post 1"},
+        {"id":"3", "author":"22", "comment":"comment example 3 for a given post 1"}
+      ]
+    },
+    {
+      "id":"2",
+      "author":"1",
+      "pdfDocument":"904ae542-0bc7-454b-87b1-5814d37b2954",
+      "postText":"post example 2 for a given pdf document",
+      "comments": [
+        {"id":"1", "author":"12", "comment":"comment example 1 for a given post 2"},
+        {"id":"2", "author":"33", "comment":"comment example 2 for a given post 2"},
+        {"id":"3", "author":"22", "comment":"comment example 3 for a given post 2"}
+      ]
+    }
+  ]
 }
