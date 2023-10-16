@@ -1,20 +1,18 @@
 package com.example.dataquery.controller;
 
 import com.example.dataquery.domain.PdfDocument;
-import com.example.dataquery.domain.ProductBidList;
-import com.example.dataquery.mongo.CustomAggregationOperation;
-import com.example.dataquery.mongo.ProductBidListRepository;
-import com.example.dataquery.mongo.ProductRepository;
 import com.example.dataquery.service.PdfService;
-import com.example.dataquery.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.IOException;
 import java.util.Base64;
+import java.util.Optional;
 
 @RestController
 public class PdfController {
@@ -27,16 +25,23 @@ public class PdfController {
                            @RequestParam("file") MultipartFile pdf)
             throws IOException {
         String id = pdfService.addPdf(title, pdf);
-        return "redirect:/photos/" + id;
+        return "Successfully uploaded PDS with id : " + id;
     }
 
     @GetMapping("/pdf/{id}")
-    public String getPhoto(@PathVariable String id, Model model) {
-        PdfDocument pdf = pdfService.getPdf(id);
-        model.addAttribute("title", pdf.getTitle());
-        model.addAttribute("image",
-                Base64.getEncoder().encodeToString(pdf.getData().getData()));
-        return "photos";
+    public ResponseEntity<byte[]> getFile(@PathVariable String id) {
+        Optional<PdfDocument> fileEntityOptional = pdfService.getPdf(id);
+
+        if (!fileEntityOptional.isPresent()) {
+            return ResponseEntity.notFound()
+                    .build();
+        }
+
+        PdfDocument fileEntity = fileEntityOptional.get();
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileEntity.getTitle() + "\"")
+                .contentType(MediaType.valueOf(fileEntity.getContentType()))
+                .body(fileEntity.getData());
     }
 
     @GetMapping("/test")
