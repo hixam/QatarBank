@@ -19,19 +19,28 @@ public class PdfService {
     @Autowired
     PdfDocumentRepository pdfDocumentRepository;
 
-    public String addPdf(String title, MultipartFile file) throws IOException {
+    public Optional<PdfDocument> addPdf(String title, MultipartFile file) throws IOException {
         PdfDocument pdf = new PdfDocument();
         pdf.setTitle(title);
         pdf.setContentType(file.getContentType());
         pdf.setId(UUID.randomUUID().toString());
         pdf.setData(file.getBytes());
-        //pdf.setData(new Binary(BsonBinarySubType.BINARY, file.getBytes()));
-        pdf = pdfDocumentRepository.save(pdf);
-        return pdf.getId();
+        return Optional.of(pdfDocumentRepository.save(pdf));
     }
 
     public Optional<PdfDocument> getPdf(String id) {
         return pdfDocumentRepository.findById(id);
+    }
+
+    public void deletePdf(String id){
+        pdfDocumentRepository.deleteById(id);
+    }
+
+    public Optional<PdfDocument> updatePdf(String id, String newFileName) {
+        PdfDocument pdfToUpdate = new PdfDocument();
+        pdfToUpdate.setId(id);
+        pdfToUpdate.setTitle(newFileName);
+        return Optional.of(pdfDocumentRepository.save(pdfToUpdate));
     }
 
     public List<PdfDocument> getAllPdfs() {

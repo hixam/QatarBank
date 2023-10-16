@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.Base64;
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -23,27 +24,35 @@ public class PdfController {
     PdfService pdfService;
 
     @PostMapping("/pdf/add")
-    public String addPhoto(@RequestParam("title") String title,
+    public ResponseEntity<PdfDocument> addPdf(@RequestParam("title") String title,
                            @RequestParam("file") MultipartFile pdf)
             throws IOException {
-        String id = pdfService.addPdf(title, pdf);
-        return "Successfully uploaded PDS with id : " + id;
+        return pdfService.addPdf(title, pdf).map(pdfDocument -> ResponseEntity.ok().body(pdfDocument)).orElseGet(() -> ResponseEntity.notFound()
+                .build());
+    }
+
+    @DeleteMapping("/pdf/delete/{id}")
+    public void deletePdf(@PathVariable("id") String id) {
+        pdfService.deletePdf(id);
+    }
+
+    @PutMapping("/pdf/edit/{id}")
+    public ResponseEntity<PdfDocument> updatePdf(@RequestParam("title") String title,
+                           @PathVariable("id") String id) {
+        return pdfService.updatePdf(id, title).map(pdfDocument -> ResponseEntity.ok().body(pdfDocument)).orElseGet(() -> ResponseEntity.notFound()
+                .build());
+
     }
 
     @GetMapping("/pdf/{id}")
     public ResponseEntity<byte[]> getPdf(@PathVariable String id) {
-        Optional<PdfDocument> fileEntityOptional = pdfService.getPdf(id);
 
-        if (!fileEntityOptional.isPresent()) {
-            return ResponseEntity.notFound()
-                    .build();
-        }
+        return pdfService.getPdf(id).map(pdfDocument -> ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + pdfDocument.getTitle() + "\"")
+                .contentType(MediaType.valueOf(pdfDocument.getContentType()))
+                .body(pdfDocument.getData())).orElseGet(() -> ResponseEntity.notFound()
+                .build());
 
-        PdfDocument fileEntity = fileEntityOptional.get();
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + fileEntity.getTitle() + "\"")
-                .contentType(MediaType.valueOf(fileEntity.getContentType()))
-                .body(fileEntity.getData());
     }
 
     @GetMapping("/pdf/info/id")

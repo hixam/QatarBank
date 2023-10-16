@@ -24,28 +24,6 @@ spring:
               - POST
               - PUT
       routes:
-
-        - id: bids
-          uri: lb://bids
-          predicates:
-            - Path=/bids/**
-          filters:
-            - StripPrefix=1
-
-        - id: products
-          uri: lb://products
-          predicates:
-            - Path=/products/**
-          filters:
-            - StripPrefix=1
-
-        - id: command
-          uri: lb://command
-          predicates:
-            - Path=/command/**
-          filters:
-            - StripPrefix=1
-
         - id: query
           uri: lb://query
           predicates:
