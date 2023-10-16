@@ -1,0 +1,78 @@
+server:
+  port: 8080
+
+spring:
+  main:
+    web-application-type: reactive
+  application:
+    name: gateway
+  cloud:
+    loadbalancer:
+      ribbon:
+        enabled: false
+    gateway:
+      globalcors:
+        add-to-simple-url-handler-mapping: true
+        cors-configurations:
+          '[/**]':
+            allow-credentials: true
+            allowed-origins: '*'
+            allowed-headers: '*'
+            allowed-methods:
+              - OPTIONS
+              - GET
+              - POST
+              - PUT
+      routes:
+
+        - id: bids
+          uri: lb://bids
+          predicates:
+            - Path=/bids/**
+          filters:
+            - StripPrefix=1
+
+        - id: products
+          uri: lb://products
+          predicates:
+            - Path=/products/**
+          filters:
+            - StripPrefix=1
+
+        - id: command
+          uri: lb://command
+          predicates:
+            - Path=/command/**
+          filters:
+            - StripPrefix=1
+
+        - id: query
+          uri: lb://query
+          predicates:
+            - Path=/query/**
+          filters:
+            - StripPrefix=1
+
+
+
+
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    registerWithEureka: true
+    fetchRegistry: true
+    service-url:
+      default-zone: http://localhost:8761/eureka
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+  endpoint:
+    health:
+      show-details: always
+    beans:
+      enabled: true
