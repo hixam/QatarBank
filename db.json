@@ -25,12 +25,12 @@
     }
   ],
 "comments": [
-        {"id":"1", "author":"12", "post":"1", "comment":"comment example 1 for a given post"},
-        {"id":"2", "author":"12", "post":"1", "comment":"comment example 2 for a given post"},
-        {"id":"3", "author":"22", "post":"1", "comment":"comment example 3 for a given post"},
-        {"id":"4", "author":"12", "post":"2", "comment":"comment example 3 for a given post"},
-        {"id":"5", "author":"32", "post":"2", "comment":"comment example 3 for a given post"},
-        {"id":"6", "author":"32", "post":"2", "comment":"comment example 3 for a given post"},
-        {"id":"7", "author":"22", "post":"2", "comment":"comment example 3 for a given post"}
+        {"id":"1", "author":"12", "postId":"1", "comment":"comment example 1 for a given post"},
+        {"id":"2", "author":"12", "postId":"1", "comment":"comment example 2 for a given post"},
+        {"id":"3", "author":"22", "postId":"1", "comment":"comment example 3 for a given post"},
+        {"id":"4", "author":"12", "postId":"2", "comment":"comment example 3 for a given post"},
+        {"id":"5", "author":"32", "postId":"2", "comment":"comment example 3 for a given post"},
+        {"id":"6", "author":"32", "postId":"2", "comment":"comment example 3 for a given post"},
+        {"id":"7", "author":"22", "postId":"2", "comment":"comment example 3 for a given post"}
       ]
 }
