@@ -11,7 +11,6 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter
 
 @EnableFeignClients
 @SpringBootApplication
-@EnableWebMvc
 public class ProductsApplication {
 
 	public static void main(String[] args) {
