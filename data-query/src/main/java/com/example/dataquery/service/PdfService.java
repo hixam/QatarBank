@@ -20,12 +20,16 @@ public class PdfService {
     PdfDocumentRepository pdfDocumentRepository;
 
     public Optional<PdfDocument> addPdf(String title, MultipartFile file) throws IOException {
-        PdfDocument pdf = new PdfDocument();
-        pdf.setTitle(title);
-        pdf.setContentType(file.getContentType());
-        pdf.setId(UUID.randomUUID().toString());
-        pdf.setData(file.getBytes());
-        return Optional.of(pdfDocumentRepository.save(pdf));
+        return Optional.of(pdfDocumentRepository.save(buildPdfEntity(title, file)));
+    }
+
+    private PdfDocument buildPdfEntity(String title, MultipartFile file) throws IOException {
+        return PdfDocument.builder()
+                .data(file.getBytes())
+                .id(String.valueOf(UUID.randomUUID()))
+                .title(title)
+                .contentType(file.getContentType())
+                .build();
     }
 
     public Optional<PdfDocument> getPdf(String id) {
@@ -37,10 +41,12 @@ public class PdfService {
     }
 
     public Optional<PdfDocument> updatePdf(String id, String newFileName) {
-        PdfDocument pdfToUpdate = new PdfDocument();
-        pdfToUpdate.setId(id);
-        pdfToUpdate.setTitle(newFileName);
-        return Optional.of(pdfDocumentRepository.save(pdfToUpdate));
+        Optional<PdfDocument> pdfToUpdate = getPdf(id);
+        if (pdfToUpdate.isPresent()){
+            pdfToUpdate.get().setTitle(newFileName);
+            return Optional.of(pdfDocumentRepository.save(pdfToUpdate.get()));
+        }
+        return Optional.empty();
     }
 
     public List<PdfDocument> getAllPdfs() {
