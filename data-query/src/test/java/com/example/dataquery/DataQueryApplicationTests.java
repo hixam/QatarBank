@@ -4,6 +4,7 @@ import com.example.dataquery.domain.PdfDocument;
 import com.example.dataquery.mongo.PdfDocumentRepository;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -48,28 +50,26 @@ class DataQueryApplicationTests {
 	private PdfDocumentRepository pdfDocumentRepository;
 
 
-//	@Test
-//	void createPdfDocumentTest() throws Exception {
-//		String uuid = UUID.randomUUID().toString();
-//		String title = "test title";
-//
-//		MockMultipartFile file
-//				= new MockMultipartFile(
-//				title,
-//				"hello.pdf",
-//				MediaType.APPLICATION_PDF_VALUE,
-//				"Hello, World!".getBytes()
-//		);
-//
-//		MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
-//		mockMvc.perform(MockMvcRequestBuilders.multipart("/pdf/add")
-//				.file(file)
-//				.param("some-random", "4"))
-//				.andExpect(status().is(200));
-//
-//		Optional<PdfDocument> pdfEntity = pdfDocumentRepository.findById(uuid);
-//		assertThat(pdfEntity.isPresent());
-//	}
+	@Test
+	void createPdfDocumentTest() throws Exception {
+		String uuid = UUID.randomUUID().toString();
+		String title = "test title";
+
+		MockMultipartFile file
+				= new MockMultipartFile(
+				title,
+				"hello.txt",
+				MediaType.APPLICATION_PDF_VALUE,
+				"Hello, World!".getBytes()
+		);
+
+		MockMvc mockMvc = MockMvcBuilders.webAppContextSetup(webApplicationContext).build();
+
+		mockMvc.perform(MockMvcRequestBuilders.multipart("/pdf/add")
+				.file("file", file.getBytes()).param("title", title)
+				.characterEncoding("UTF-8"))
+				.andExpect(status().isOk());
+	}
 
 	@Test
 	void updatePdfDocumentTest() throws Exception {
@@ -124,18 +124,23 @@ class DataQueryApplicationTests {
 	@Test
 	void getAllPdfsInfoTest() throws Exception {
 		List<PdfDocument> list = pdfDocumentRepository.findAll();
-		String id = list.get(0).getId();
+		PdfDocument pdf = list.get(0);
 
-		MvcResult result = mockMvc.perform(get("/pdf/info/{id}", id)
+		MvcResult result = mockMvc.perform(get("/pdf/info/{id}", pdf.getId())
 				.contentType("application/json")
 				)
 				.andExpect(status().isOk())
 				.andReturn();
-		ObjectMapper mapper = new ObjectMapper();
 
-//		Optional<PdfDocument> actual = mapper.readValue(result.getResponse().getContentAsString(), new TypeReference<Optional<PdfDocument>>() {});
-//
-//		assertEquals(actual.get().getId(), id);
+		PdfDocument res = PdfDocument.builder()
+				.data(JsonPath.read(result.getResponse().getContentAsString(), "$.data").toString().getBytes())
+				.id(JsonPath.read(result.getResponse().getContentAsString(), "$.id"))
+				.title(JsonPath.read(result.getResponse().getContentAsString(), "$.title"))
+				.contentType(JsonPath.read(result.getResponse().getContentAsString(), "$.contentType"))
+				.build();
+
+		assertEquals(res.getId(), pdf.getId());
+		assertEquals(res.getTitle(), pdf.getTitle());
 	}
 
 	@Test

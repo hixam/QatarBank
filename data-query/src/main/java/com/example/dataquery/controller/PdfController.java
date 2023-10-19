@@ -4,6 +4,7 @@ import com.example.dataquery.domain.PdfDocument;
 import com.example.dataquery.service.PdfService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -24,11 +25,10 @@ public class PdfController {
     PdfService pdfService;
 
     @PostMapping("/pdf/add")
-    public ResponseEntity<PdfDocument> addPdf(@RequestParam("title") String title,
+    public ResponseEntity<String> addPdf(@RequestParam("title") String title,
                            @RequestParam("file") MultipartFile pdf)
             throws IOException {
-        return pdfService.addPdf(title, pdf).map(pdfDocument -> ResponseEntity.ok().body(pdfDocument)).orElseGet(() -> ResponseEntity.notFound()
-                .build());
+        return pdfService.addPdf(title, pdf).map(pdfDocument -> new ResponseEntity<String>(HttpStatus.OK)).orElseGet(() -> new ResponseEntity<String>(HttpStatus.NOT_FOUND));
     }
 
     @DeleteMapping("/pdf/delete/{id}")
@@ -67,8 +67,8 @@ public class PdfController {
     }
 
     @GetMapping("/pdf/info/{id}")
-    public Optional<PdfDocument> getPdfInfo(@PathVariable String id) {
-        return pdfService.getPdf(id);
+    public PdfDocument getPdfInfo(@PathVariable String id) {
+        return pdfService.getPdf(id).get();
     }
 
     @GetMapping("/test")
